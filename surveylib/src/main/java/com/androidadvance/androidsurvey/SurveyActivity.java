@@ -22,12 +22,16 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+/**
+ * The class that creates the survey, it should be initialized with an intent containing the json.
+ */
 public class SurveyActivity extends AppCompatActivity {
 
     private SurveyPojo mSurveyPojo;
     private ViewPager mPager;
     private String style_string = null;
 
+    // todo: A better way to start a survey, using a helper class that initializes everything and creates the intent
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
