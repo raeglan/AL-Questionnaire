@@ -8,4 +8,4 @@
 local.properties
 .idea
 .idea/
-android_survey.iml
+*.iml
