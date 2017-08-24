@@ -38,9 +38,9 @@ public class FragmentCheckboxes extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_checkboxes, container, false);
 
-        button_continue = (Button) rootView.findViewById(R.id.button_continue);
-        textview_q_title = (TextView) rootView.findViewById(R.id.textview_q_title);
-        linearLayout_checkboxes = (LinearLayout) rootView.findViewById(R.id.linearLayout_checkboxes);
+        button_continue = rootView.findViewById(R.id.button_continue);
+        textview_q_title = rootView.findViewById(R.id.textview_q_title);
+        linearLayout_checkboxes = rootView.findViewById(R.id.linearLayout_checkboxes);
         button_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,23 +54,26 @@ public class FragmentCheckboxes extends Fragment {
     private void collect_data() {
 
         //----- collection & validation for is_required
-        String the_choices = "";
-        boolean at_leaset_one_checked = false;
+        StringBuilder answers = new StringBuilder();
+        boolean atLeastOneChecked = false;
         for (CheckBox cb : allCb) {
             if (cb.isChecked()) {
-                at_leaset_one_checked = true;
-                the_choices = the_choices + cb.getText().toString() + ", ";
+                atLeastOneChecked = true;
+                answers.append(cb.getText().toString());
+                answers.append(", ");
             }
         }
 
-        if (the_choices.length() > 2) {
-            the_choices = the_choices.substring(0, the_choices.length() - 2);
-            Answers.getInstance().put_answer(textview_q_title.getText().toString(), the_choices);
+        if (answers.length() > 2) {
+            // removing the last ", "
+            answers.delete(answers.length() - 2, answers.length());
+            Answers.getInstance().put_answer(textview_q_title.getText().toString(),
+                    answers.toString());
         }
 
 
         if (q_data.getRequired()) {
-            if (at_leaset_one_checked) {
+            if (atLeastOneChecked) {
                 button_continue.setVisibility(View.VISIBLE);
             } else {
                 button_continue.setVisibility(View.GONE);

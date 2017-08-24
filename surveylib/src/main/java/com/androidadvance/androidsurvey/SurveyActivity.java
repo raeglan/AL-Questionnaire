@@ -121,7 +121,7 @@ public class SurveyActivity extends AppCompatActivity {
         arraylist_fragments.add(frag_end);
 
 
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = findViewById(R.id.pager);
         AdapterFragmentQ mPagerAdapter = new AdapterFragmentQ(getSupportFragmentManager(), arraylist_fragments);
         mPager.setAdapter(mPagerAdapter);
 
@@ -144,7 +144,7 @@ public class SurveyActivity extends AppCompatActivity {
 
     public void event_survey_completed(Answers instance) {
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("answers", instance.get_json_object());
+        returnIntent.putExtra("answers", instance.getJsonAndResetAnswers());
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }

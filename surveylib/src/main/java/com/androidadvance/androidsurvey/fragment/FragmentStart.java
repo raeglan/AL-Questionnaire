@@ -26,8 +26,8 @@ public class FragmentStart extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_start, container, false);
 
-        textView_start = (TextView) rootView.findViewById(R.id.textView_start);
-        Button button_continue = (Button) rootView.findViewById(R.id.button_continue);
+        textView_start = rootView.findViewById(R.id.textView_start);
+        Button button_continue = rootView.findViewById(R.id.button_continue);
         button_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
