@@ -1,9 +1,14 @@
 package com.androidadvance.androidsurvey.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +16,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.androidadvance.androidsurvey.R;
+import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.SurveyActivity;
 import com.androidadvance.androidsurvey.models.SurveyProperties;
+import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 
 public class FragmentStart extends Fragment {
@@ -35,6 +42,9 @@ public class FragmentStart extends Fragment {
             }
         });
 
+        // Personalizing
+        SurveyViewUtils.personalizeButton(getActivity(), Survey.KEY_START_TEXT_RES, button_continue);
+
         return rootView;
     }
 
@@ -47,8 +57,6 @@ public class FragmentStart extends Fragment {
 
         assert survery_properties != null;
         textView_start.setText(Html.fromHtml(survery_properties.getIntroMessage()));
-
-
 
 
     }

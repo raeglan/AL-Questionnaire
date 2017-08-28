@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import com.androidadvance.androidsurvey.Answers;
 import com.androidadvance.androidsurvey.R;
+import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.SurveyActivity;
 import com.androidadvance.androidsurvey.models.SurveyProperties;
+import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 public class FragmentEnd extends Fragment {
 
@@ -27,8 +29,8 @@ public class FragmentEnd extends Fragment {
                 R.layout.fragment_end, container, false);
 
 
-        Button button_finish = (Button) rootView.findViewById(R.id.button_finish);
-        textView_end = (TextView) rootView.findViewById(R.id.textView_end);
+        Button button_finish = rootView.findViewById(R.id.button_finish);
+        textView_end = rootView.findViewById(R.id.textView_end);
 
 
         button_finish.setOnClickListener(new View.OnClickListener() {
@@ -39,6 +41,10 @@ public class FragmentEnd extends Fragment {
 
             }
         });
+
+        // Personalizing
+        SurveyViewUtils
+                .personalizeButton(getActivity(), Survey.KEY_FINISH_TEXT_RES, button_finish);
 
         return rootView;
     }

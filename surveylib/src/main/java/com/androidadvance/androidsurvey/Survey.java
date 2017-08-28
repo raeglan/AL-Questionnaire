@@ -22,11 +22,15 @@ import java.io.File;
 public class Survey {
 
     /**
-     * The survey preferences containing colors, texts and maybe much more.
+     * The survey preferences containing colors, texts and maybe much more. Please don't edit this
+     * by hand, leave the survey professionals do their job.
      */
-    static final String KEY_SURVEY_PREFERENCES = "de.alfingo.survey.preferences";
+    public static final String KEY_SURVEY_PREFERENCES = "de.alfingo.survey.preferences";
 
-    static final String KEY_BUTTON_BACKGROUND_COLOR_INT = "button_background_color",
+    /**
+     * The keys for all the preferences saved as customization.
+     */
+    public static final String KEY_BUTTON_BACKGROUND_COLOR_INT = "button_background_color",
             KEY_BUTTON_TEXT_COLOR_INT = "button_text_color",
             KEY_FINISH_TEXT_RES = "finish_res",
             KEY_CONTINUE_TEXT_RES = "continue_res",
@@ -39,50 +43,51 @@ public class Survey {
     private final String mJsonString;
 
     /**
-     * The color for the Continue, finish and start button.
+     * The shared preferences used for saving customization.
      */
-    private @ColorInt
-    int mButtonBackgroundColor;
-
-    /**
-     * The color for the Continue, finish and start button text.
-     */
-    private @ColorInt
-    int mButtonTextColor;
-
-    /**
-     * Resources which should be used instead of the standard ones.
-     */
-    private @StringRes
-    int mContinueRes, mFinishRes, mStartRes, mCloseRes;
+    private final SharedPreferences mSurveyPreferences;
 
     /**
      * Initializes the survey object, you can just launch it as is using the launchSurvey method or
      * change the color and other aspects from the survey.
-     * <br><br> After launching or selecting save, all the given specifications will be saved on
-     * device in form of a shared preferences, you can use this class to save the "look-and-feel"
+     * <br><br> Everything inputted will be saved on the
+     * device in form of shared preferences, you can use this class to save the "look-and-feel"
      * at the beginning and only use the survey somewhere later.
      *
      * @param jsonString a string containing all the questions that should be displayed or
      *                   {@code null} if all you want to do is saving the configuration
      *                   todo: Link document of JSON format.
+     * @param context    the context for accessing shared preferences.
      */
-    public Survey(@Nullable String jsonString) {
+    public Survey(@Nullable String jsonString, @NonNull Context context) {
         mJsonString = jsonString;
+        mSurveyPreferences = context.getSharedPreferences(KEY_SURVEY_PREFERENCES,
+                Context.MODE_PRIVATE);
     }
 
     /**
-     * Sets the button background and text color. If the background is left null, then it will
-     * continue being green and making the text color null will leave it white.
+     * Sets the button text color.
      *
-     * @param backgroundColor the background color of the button
-     * @param textColor       the displayed text color of the button
+     * @param textColor the displayed text color of the button
      * @return the survey object to continue editing
      */
-    public Survey setButtonColor(@Nullable Color backgroundColor, @Nullable Color textColor) {
-        // todo: change color to ints.
-        mButtonBackgroundColor = backgroundColor;
-        mButtonTextColor = textColor;
+    public Survey setButtonTextColor(@ColorInt int textColor) {
+        mSurveyPreferences.edit()
+                .putInt(KEY_BUTTON_TEXT_COLOR_INT, textColor)
+                .apply();
+        return this;
+    }
+
+    /**
+     * Sets the background color from the continue, finish, and start button.
+     *
+     * @param backgroundColor the new background color for the button.
+     * @return the survey object for continued editing.
+     */
+    public Survey setButtonBackgroundColor(@ColorInt int backgroundColor) {
+        mSurveyPreferences.edit()
+                .putInt(KEY_BUTTON_BACKGROUND_COLOR_INT, backgroundColor)
+                .apply();
         return this;
     }
 
@@ -102,7 +107,9 @@ public class Survey {
      * @return the object for continued editing.
      */
     public Survey setContinueText(@StringRes int continueRes) {
-        mContinueRes = continueRes;
+        mSurveyPreferences.edit()
+                .putInt(KEY_CONTINUE_TEXT_RES, continueRes)
+                .apply();
         return this;
     }
 
@@ -122,7 +129,9 @@ public class Survey {
      * @return the object for continued editing.
      */
     public Survey setFinishText(@StringRes int finishRes) {
-        mFinishRes = finishRes;
+        mSurveyPreferences.edit()
+                .putInt(KEY_FINISH_TEXT_RES, finishRes)
+                .apply();
         return this;
     }
 
@@ -142,7 +151,9 @@ public class Survey {
      * @return the object for continued editing.
      */
     public Survey setCloseText(@StringRes int closeRes) {
-        mCloseRes = closeRes;
+        mSurveyPreferences.edit()
+                .putInt(KEY_CLOSE_TEXT_RES, closeRes)
+                .apply();
         return this;
     }
 
@@ -162,23 +173,9 @@ public class Survey {
      * @return Survey, for continued editing.
      */
     public Survey setStartText(@StringRes int startRes) {
-        mStartRes = startRes;
-        return this;
-    }
-
-    /**
-     * Saves all the previously inputted configuration, if any.
-     *
-     * @param packageContext the context which will be used to get shared preferences.
-     * @return the object for continued editing.
-     */
-    public Survey saveConfiguration(@NonNull Context packageContext) {
-        SharedPreferences preferences =
-                packageContext.getSharedPreferences(KEY_SURVEY_PREFERENCES, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        if (mButtonBackgroundColor != null) {
-            editor.putInt(KEY_BUTTON_BACKGROUND_COLOR_INT, mButtonBackgroundColor);
-        }
+        mSurveyPreferences.edit()
+                .putInt(KEY_START_TEXT_RES, startRes)
+                .apply();
         return this;
     }
 

@@ -1,11 +1,15 @@
 package androidadvance.com.androidsurveyexample;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.SurveyActivity;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,11 +32,16 @@ public class MainActivity extends AppCompatActivity {
         button_survey_example_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent i_survey = new Intent(MainActivity.this, SurveyActivity.class);
-                //you have to pass as an extra the json string.
-                i_survey.putExtra("json_survey", loadSurveyJson("example_survey_1.json"));
-                startActivityForResult(i_survey, SURVEY_REQUEST);
+                Survey surveyOne = new Survey(loadSurveyJson("example_survey_1.json"),
+                        MainActivity.this);
+                surveyOne
+                        .setStartText(R.string.test_start)
+                        .setFinishText(R.string.test_finish)
+                        .setContinueText(0)
+                        .setButtonBackgroundColor(Integer.MAX_VALUE)
+                        .setButtonTextColor(Color.BLACK)
+                        .launchSurvey(MainActivity.this, MainActivity.this,
+                                SURVEY_REQUEST);
             }
         });
 

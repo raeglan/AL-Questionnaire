@@ -17,8 +17,10 @@ import android.widget.TextView;
 
 import com.androidadvance.androidsurvey.Answers;
 import com.androidadvance.androidsurvey.R;
+import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.SurveyActivity;
 import com.androidadvance.androidsurvey.models.Question;
+import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 public class FragmentTextSimple extends Fragment {
 
@@ -44,6 +46,9 @@ public class FragmentTextSimple extends Fragment {
             }
         });
 
+        // Personalizing
+        SurveyViewUtils
+                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, button_continue);
 
         return rootView;
     }

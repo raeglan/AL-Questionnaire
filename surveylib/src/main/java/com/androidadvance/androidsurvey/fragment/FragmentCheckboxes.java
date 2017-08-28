@@ -16,8 +16,10 @@ import android.widget.TextView;
 
 import com.androidadvance.androidsurvey.Answers;
 import com.androidadvance.androidsurvey.R;
+import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.SurveyActivity;
 import com.androidadvance.androidsurvey.models.Question;
+import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +49,10 @@ public class FragmentCheckboxes extends Fragment {
                 ((SurveyActivity) mContext).go_to_next();
             }
         });
+
+        // Personalizing
+        SurveyViewUtils
+                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, button_continue);
 
         return rootView;
     }
