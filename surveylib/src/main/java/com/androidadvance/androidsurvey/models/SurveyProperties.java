@@ -18,7 +18,10 @@ public class SurveyProperties implements Serializable {
     private String endMessage;
     @SerializedName("skip_intro")
     @Expose
-    private Boolean skipIntro;
+    private Boolean skipIntro = Boolean.FALSE;
+    @SerializedName("conditional_linking")
+    @Expose
+    private Boolean conditionalLinking = false;
 
     /**
      * @return The title
@@ -74,6 +77,15 @@ public class SurveyProperties implements Serializable {
      */
     public void setSkipIntro(Boolean skipIntro) {
         this.skipIntro = skipIntro;
+    }
+
+    /**
+     * gets if conditional linking is on.
+     *
+     * @return A boolean containing if the conditional linking should be used or not.
+     */
+    public Boolean getConditionalLinking() {
+        return conditionalLinking;
     }
 
 }

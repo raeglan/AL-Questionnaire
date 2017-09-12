@@ -38,6 +38,12 @@ public class Survey {
             KEY_START_TEXT_RES = "start_res";
 
     /**
+     * Names for passing information over intents and bundles.
+     */
+    public static final String KEY_SURVEY_JSON = "json_survey",
+            KEY_SURVEY_PROPERTIES = "survey_properties";
+
+    /**
      * The Json containing all the questionnaire information.
      */
     private final String mJsonString;
@@ -192,7 +198,7 @@ public class Survey {
                              int requestCode) {
         if (mJsonString != null) {
             Intent i_survey = new Intent(context, SurveyActivity.class);
-            i_survey.putExtra("json_survey", mJsonString);
+            i_survey.putExtra(KEY_SURVEY_JSON, mJsonString);
             returnActivity.startActivityForResult(i_survey, requestCode);
         }
     }

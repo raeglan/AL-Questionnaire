@@ -30,106 +30,124 @@ public class SurveyActivity extends AppCompatActivity {
     private SurveyPojo mSurveyPojo;
     private ViewPager mPager;
     private String style_string = null;
+    /**
+     * All the fragments which are to be displayed in the pager. When using linking this list will
+     * be edited while answering the survey.
+     */
+    private ArrayList<Fragment> pagerFragments;
 
+    // todo: Make the activity lifecycle aware/safe.
     // todo: A better way to start a survey, using a helper class that initializes everything and creates the intent
+    // todo: conditional linking: rules for given answers.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_survey);
 
 
-
         if (getIntent().getExtras() != null) {
             Bundle bundle = getIntent().getExtras();
             mSurveyPojo = new Gson().fromJson(bundle.getString("json_survey"), SurveyPojo.class);
-            if (bundle.containsKey("style")) {
-                style_string = bundle.getString("style");
-            }
         }
 
 
         Log.i("json Object = ", String.valueOf(mSurveyPojo.getQuestions()));
 
-        final ArrayList<Fragment> arraylist_fragments = new ArrayList<>();
+        pagerFragments = new ArrayList<>();
 
         //- START -
         if (!mSurveyPojo.getSurveyProperties().getSkipIntro()) {
             FragmentStart frag_start = new FragmentStart();
             Bundle sBundle = new Bundle();
             sBundle.putSerializable("survery_properties", mSurveyPojo.getSurveyProperties());
-            sBundle.putString("style", style_string);
             frag_start.setArguments(sBundle);
-            arraylist_fragments.add(frag_start);
+            pagerFragments.add(frag_start);
         }
 
         //- FILL -
-        for (Question mQuestion : mSurveyPojo.getQuestions()) {
-
-            if (mQuestion.getQuestionType().equals("String")) {
-                FragmentTextSimple frag = new FragmentTextSimple();
-                Bundle xBundle = new Bundle();
-                xBundle.putSerializable("data", mQuestion);
-                xBundle.putString("style", style_string);
-                frag.setArguments(xBundle);
-                arraylist_fragments.add(frag);
-            }
-
-            if (mQuestion.getQuestionType().equals("Checkboxes")) {
-                FragmentCheckboxes frag = new FragmentCheckboxes();
-                Bundle xBundle = new Bundle();
-                xBundle.putSerializable("data", mQuestion);
-                xBundle.putString("style", style_string);
-                frag.setArguments(xBundle);
-                arraylist_fragments.add(frag);
-            }
-
-            if (mQuestion.getQuestionType().equals("Radioboxes")) {
-                FragmentRadioboxes frag = new FragmentRadioboxes();
-                Bundle xBundle = new Bundle();
-                xBundle.putSerializable("data", mQuestion);
-                xBundle.putString("style", style_string);
-                frag.setArguments(xBundle);
-                arraylist_fragments.add(frag);
-            }
-
-            if (mQuestion.getQuestionType().equals("Number")) {
-                FragmentNumber frag = new FragmentNumber();
-                Bundle xBundle = new Bundle();
-                xBundle.putSerializable("data", mQuestion);
-                xBundle.putString("style", style_string);
-                frag.setArguments(xBundle);
-                arraylist_fragments.add(frag);
-            }
-
-            if (mQuestion.getQuestionType().equals("StringMultiline")) {
-                FragmentMultiline frag = new FragmentMultiline();
-                Bundle xBundle = new Bundle();
-                xBundle.putSerializable("data", mQuestion);
-                xBundle.putString("style", style_string);
-                frag.setArguments(xBundle);
-                arraylist_fragments.add(frag);
-            }
-
-        }
+        if (mSurveyPojo.getSurveyProperties().getConditionalLinking())
+            addQuestion(mSurveyPojo.getQuestions().get(0));
+        else for (Question question : mSurveyPojo.getQuestions())
+            addQuestion(question);
 
         //- END -
         FragmentEnd frag_end = new FragmentEnd();
         Bundle eBundle = new Bundle();
         eBundle.putSerializable("survery_properties", mSurveyPojo.getSurveyProperties());
-        eBundle.putString("style", style_string);
         frag_end.setArguments(eBundle);
-        arraylist_fragments.add(frag_end);
+        pagerFragments.add(frag_end);
 
 
         mPager = findViewById(R.id.pager);
-        AdapterFragmentQ mPagerAdapter = new AdapterFragmentQ(getSupportFragmentManager(), arraylist_fragments);
+        AdapterFragmentQ mPagerAdapter = new AdapterFragmentQ(getSupportFragmentManager(), pagerFragments);
         mPager.setAdapter(mPagerAdapter);
 
 
     }
 
-    public void go_to_next() {
+    /**
+     * Adds the question given as the second to last item on the pager, so that the end always
+     * takes the last laugh.
+     *
+     * @param question The question pojo which should be converted and added.
+     */
+    private void addQuestion(Question question) {
+        Fragment fragment;
+        switch (question.getQuestionType()) {
+            case "String":
+                fragment = new FragmentTextSimple();
+                break;
+            case "Checkboxes":
+                fragment = new FragmentCheckboxes();
+                break;
+            case "Radioboxes":
+                fragment = new FragmentRadioboxes();
+                break;
+            case "Number":
+                fragment = new FragmentNumber();
+                break;
+            case "StringMultiline":
+                fragment = new FragmentMultiline();
+                break;
+            default:
+                throw new UnsupportedOperationException("Question type not known: " +
+                        question.getQuestionType());
+        }
+
+        Bundle arguments = new Bundle();
+        arguments.putSerializable("data", question);
+        fragment.setArguments(arguments);
+
+        pagerFragments.add(pagerFragments.size() - 1, fragment);
+    }
+
+    /**
+     * Appends the end screen to the pager.
+     */
+    private void putAnEndToItAll() {
+
+    }
+
+    public void goToNext() {
         mPager.setCurrentItem(mPager.getCurrentItem() + 1);
+    }
+
+    /**
+     * Adds the question on the given position to the pager and moves to it.
+     *
+     * @param questionNumber which index number the question has, if it doesn't exist it goes to the
+     *                       end directly.
+     */
+    public void goToQuestion(int questionNumber) {
+        // if no conditional linking is activated we only want to move to the next question.
+        if (mSurveyPojo.getSurveyProperties().getConditionalLinking()) {
+            if (questionNumber < 0 || questionNumber >= mSurveyPojo.getQuestions().size()) {
+
+            } else {
+
+            }
+        }
+        goToNext();
     }
 
 

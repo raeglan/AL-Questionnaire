@@ -41,7 +41,7 @@ public class FragmentMultiline extends Fragment {
         button_continue.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                  Answers.getInstance().put_answer(textview_q_title.getText().toString(), editText_answer.getText().toString().trim());
-                ((SurveyActivity) mContext).go_to_next();
+                ((SurveyActivity) mContext).goToNext();
             }
         });
 

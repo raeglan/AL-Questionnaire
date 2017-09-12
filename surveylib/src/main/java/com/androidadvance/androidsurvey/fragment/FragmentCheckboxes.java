@@ -46,7 +46,7 @@ public class FragmentCheckboxes extends Fragment {
         button_continue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((SurveyActivity) mContext).go_to_next();
+                ((SurveyActivity) mContext).goToNext();
             }
         });
 

@@ -1,8 +1,7 @@
 {
   "survey_properties": {
     "intro_message": "<strong>Your feedback helps us to build a better mobile product.</strong>",
-    "end_message": "Thank you for having the time to take our survey.",
-    "skip_intro": false
+    "end_message": "Thank you for having the time to take our survey."
   },
   "questions": [
     {
