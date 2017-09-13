@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +28,19 @@ import java.util.List;
 
 public class FragmentCheckboxes extends Fragment {
 
-    private Question q_data;
+    private static final String TAG = Survey.LIBRARY_NAME + ":"
+            + FragmentCheckboxes.class.getSimpleName();
+
+    private Question mQuestion;
     private FragmentActivity mContext;
-    private Button button_continue;
-    private TextView textview_q_title;
+    private Button mContinueButton;
+    private TextView mTitleTextView;
     private LinearLayout linearLayout_checkboxes;
-    private final ArrayList<CheckBox> allCb = new ArrayList<>();
+    /**
+     * The previously made link if any.
+     */
+    private int previousLink = -1;
+    private final ArrayList<CheckBox> mCheckBoxes = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,19 +48,13 @@ public class FragmentCheckboxes extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_checkboxes, container, false);
 
-        button_continue = rootView.findViewById(R.id.button_continue);
-        textview_q_title = rootView.findViewById(R.id.textview_q_title);
+        mContinueButton = rootView.findViewById(R.id.button_continue);
+        mTitleTextView = rootView.findViewById(R.id.textview_q_title);
         linearLayout_checkboxes = rootView.findViewById(R.id.linearLayout_checkboxes);
-        button_continue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((SurveyActivity) mContext).goToNext();
-            }
-        });
 
         // Personalizing
         SurveyViewUtils
-                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, button_continue);
+                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, mContinueButton);
 
         return rootView;
     }
@@ -62,7 +64,7 @@ public class FragmentCheckboxes extends Fragment {
         //----- collection & validation for is_required
         StringBuilder answers = new StringBuilder();
         boolean atLeastOneChecked = false;
-        for (CheckBox cb : allCb) {
+        for (CheckBox cb : mCheckBoxes) {
             if (cb.isChecked()) {
                 atLeastOneChecked = true;
                 answers.append(cb.getText().toString());
@@ -73,16 +75,16 @@ public class FragmentCheckboxes extends Fragment {
         if (answers.length() > 2) {
             // removing the last ", "
             answers.delete(answers.length() - 2, answers.length());
-            Answers.getInstance().put_answer(textview_q_title.getText().toString(),
+            Answers.getInstance().put_answer(mTitleTextView.getText().toString(),
                     answers.toString());
         }
 
 
-        if (q_data.getRequired()) {
+        if (mQuestion.getRequired()) {
             if (atLeastOneChecked) {
-                button_continue.setVisibility(View.VISIBLE);
+                mContinueButton.setVisibility(View.VISIBLE);
             } else {
-                button_continue.setVisibility(View.GONE);
+                mContinueButton.setVisibility(View.GONE);
             }
         }
 
@@ -94,35 +96,69 @@ public class FragmentCheckboxes extends Fragment {
 
 
         mContext = getActivity();
-        q_data = (Question) getArguments().getSerializable("data");
+        mQuestion = (Question) getArguments().getSerializable("data");
 
-        textview_q_title.setText(q_data != null ? q_data.getQuestionTitle() : "");
-
-        if (q_data.getRequired()) {
-            button_continue.setVisibility(View.GONE);
+        // Letting everyone knows when something horrible goes wrong.
+        if (mQuestion == null) {
+            Log.e(TAG, "A fragment without data was initialized, that shouldn't happen.");
+            ((SurveyActivity) mContext).goToNext();
+            return;
         }
 
-        List<String> qq_data = q_data.getChoices();
-        if (q_data.getRandomChoices()) {
-            Collections.shuffle(qq_data);
+        mTitleTextView.setText(mQuestion.getQuestionTitle());
+
+        if (mQuestion.getRequired()) {
+            mContinueButton.setVisibility(View.GONE);
         }
 
-        for (String choice : qq_data) {
-            CheckBox cb = new CheckBox(mContext);
-            cb.setText(Html.fromHtml(choice));
-            cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            cb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            linearLayout_checkboxes.addView(cb);
-            allCb.add(cb);
+        List<String> choices = mQuestion.getChoices();
+
+        if (choices.isEmpty()) {
+            Log.e(Survey.LIBRARY_NAME, "Checkbox with no choices: "
+                    + mTitleTextView.getText().toString());
+            ((SurveyActivity) mContext).goToNext();
+        }
+
+        if (mQuestion.getRandomChoices()) {
+            Collections.shuffle(choices);
+        }
+
+        for (String choice : choices) {
+            CheckBox checkBox = new CheckBox(mContext);
+            checkBox.setText(Html.fromHtml(choice));
+            checkBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            checkBox.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            linearLayout_checkboxes.addView(checkBox);
+            mCheckBoxes.add(checkBox);
 
 
-            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     collect_data();
                 }
             });
         }
+
+        // todo: Solve onBackPressed problem, when we get back to this question and then try linking again then too many fragments get added.
+        // todo: Make selecting checkboxes add new questions to the stack instead of moving to the first link.
+        mContinueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Integer> links = mQuestion.getLinks();
+                if (links != null) {
+                    for (int i = 0; i < mCheckBoxes.size(); i++) {
+                        if (mCheckBoxes.get(i).isChecked()) {
+                            int link = i >= 0 && i < links.size() ? links.get(i) : -2;
+                            ((SurveyActivity) mContext).goToQuestion(link, previousLink);
+                            previousLink = link;
+                            break;
+                        }
+                    }
+                } else
+                    ((SurveyActivity) mContext).goToNext();
+            }
+        });
 
     }
 

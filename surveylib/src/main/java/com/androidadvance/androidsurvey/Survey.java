@@ -27,6 +27,8 @@ public class Survey {
      */
     public static final String KEY_SURVEY_PREFERENCES = "de.alfingo.survey.preferences";
 
+    public static final String LIBRARY_NAME = "AlQuestion";
+
     /**
      * The keys for all the preferences saved as customization.
      */
@@ -41,7 +43,7 @@ public class Survey {
      * Names for passing information over intents and bundles.
      */
     public static final String KEY_SURVEY_JSON = "json_survey",
-            KEY_SURVEY_PROPERTIES = "survey_properties";
+            KEY_SURVEY_PROPERTIES = "survery_properties";
 
     /**
      * The Json containing all the questionnaire information.

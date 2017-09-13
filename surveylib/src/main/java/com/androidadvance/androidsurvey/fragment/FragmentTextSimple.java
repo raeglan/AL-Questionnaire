@@ -1,16 +1,15 @@
 package com.androidadvance.androidsurvey.fragment;
 
-import android.app.Service;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,33 +21,33 @@ import com.androidadvance.androidsurvey.SurveyActivity;
 import com.androidadvance.androidsurvey.models.Question;
 import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
+import java.util.List;
+
 public class FragmentTextSimple extends Fragment {
 
+    private final static String TAG = Survey.LIBRARY_NAME + ":" +
+            FragmentTextSimple.class.getSimpleName();
+
     private FragmentActivity mContext;
-    private Button button_continue;
-    private TextView textview_q_title;
-    private EditText editText_answer;
+    private Button mContinueButton;
+    private TextView mTitleTextView;
+    private EditText mAnswerEditText;
+    private int previousLink = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setUserVisibleHint(false);
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_text_simple, container, false);
 
-        button_continue = rootView.findViewById(R.id.button_continue);
-        textview_q_title = rootView.findViewById(R.id.textview_q_title);
-        editText_answer = rootView.findViewById(R.id.editText_answer);
-        button_continue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Answers.getInstance().put_answer(textview_q_title.getText().toString(), editText_answer.getText().toString().trim());
-                ((SurveyActivity) mContext).goToNext();
-            }
-        });
+        mContinueButton = rootView.findViewById(R.id.button_continue);
+        mTitleTextView = rootView.findViewById(R.id.textview_q_title);
+        mAnswerEditText = rootView.findViewById(R.id.editText_answer);
 
         // Personalizing
         SurveyViewUtils
-                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, button_continue);
+                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, mContinueButton);
 
         return rootView;
     }
@@ -59,11 +58,18 @@ public class FragmentTextSimple extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mContext = getActivity();
-        Question q_data = (Question) getArguments().getSerializable("data");
+        final Question question = (Question) getArguments().getSerializable("data");
 
-        if (q_data.getRequired()) {
-            button_continue.setVisibility(View.GONE);
-            editText_answer.addTextChangedListener(new TextWatcher() {
+        // Letting everyone knows when something horrible goes wrong.
+        if (question == null) {
+            Log.e(TAG, "A fragment without data was initialized, that shouldn't happen.");
+            ((SurveyActivity) mContext).goToNext();
+            return;
+        }
+
+        if (question.getRequired()) {
+            mContinueButton.setVisibility(View.GONE);
+            mAnswerEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -75,19 +81,41 @@ public class FragmentTextSimple extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (s.length() > 3) {
-                        button_continue.setVisibility(View.VISIBLE);
+                        mContinueButton.setVisibility(View.VISIBLE);
                     } else {
-                        button_continue.setVisibility(View.GONE);
+                        mContinueButton.setVisibility(View.GONE);
                     }
                 }
             });
         }
 
-        textview_q_title.setText(Html.fromHtml(q_data.getQuestionTitle()));
-        editText_answer.requestFocus();
-        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Service.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(editText_answer, 0);
+        mContinueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                SurveyViewUtils.hideSoftInput(mContext);
 
+                final String answer = mAnswerEditText.getText().toString().trim();
+
+                Answers.getInstance().put_answer(mTitleTextView.getText().toString(), answer);
+
+                List<Integer> links = question.getLinks();
+                if (links != null) {
+                    int link = answer.isEmpty() ? 0 : 1;
+                    ((SurveyActivity) mContext).goToQuestion(link, previousLink);
+                    previousLink = link;
+                } else
+                    ((SurveyActivity) mContext).goToNext();
+            }
+        });
+
+        mTitleTextView.setText(Html.fromHtml(question.getQuestionTitle()));
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser)
+            SurveyViewUtils.showSoftInput(mAnswerEditText, mContext);
     }
 }

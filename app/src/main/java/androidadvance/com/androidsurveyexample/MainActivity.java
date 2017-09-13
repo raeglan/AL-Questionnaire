@@ -25,20 +25,20 @@ public class MainActivity extends AppCompatActivity {
 
         //Nothing fancy here. Plain old simple buttons....
 
-        Button button_survey_example_1 = (Button) findViewById(R.id.button_survey_example_1);
-        Button button_survey_example_2 = (Button) findViewById(R.id.button_survey_example_2);
-        Button button_survey_example_3 = (Button) findViewById(R.id.button_survey_example_3);
+        Button button_survey_example_1 = findViewById(R.id.button_survey_example_1);
+        Button button_survey_example_2 = findViewById(R.id.button_survey_example_2);
+        Button button_survey_example_3 = findViewById(R.id.button_survey_example_3);
 
         button_survey_example_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Survey surveyOne = new Survey(loadSurveyJson("example_survey_1.json"),
+                Survey surveyOne = new Survey(loadSurveyJson("example_survey_4.json"),
                         MainActivity.this);
                 surveyOne
                         .setStartText(R.string.test_start)
                         .setFinishText(R.string.test_finish)
-                        .setContinueText(0)
-                        .setButtonBackgroundColor(Integer.MAX_VALUE)
+                        .setContinueText(R.string.test_continue)
+                        .setButtonBackgroundColor(Color.WHITE)
                         .setButtonTextColor(Color.BLACK)
                         .launchSurvey(MainActivity.this, MainActivity.this,
                                 SURVEY_REQUEST);

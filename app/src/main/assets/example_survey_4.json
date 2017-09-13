@@ -1,0 +1,64 @@
+{
+  "survey_properties": {
+    "intro_message": "<strong>This is a test with links!</strong>",
+    "end_message": "Thanks for letting me know how you truly feel about me!",
+    "conditional_linking": true
+  },
+  "questions": [
+    {
+      "question_type": "String",
+      "question_title": "What is your name?",
+      "description": "",
+      "required": true
+    },
+    {
+      "question_type": "Radioboxes",
+      "question_title": "How much do you like Rafael?",
+      "description": "",
+      "required": true,
+      "random_choices": false,
+      "choices": [
+        "I love him!",
+        "Very much!",
+        "It would be weird admitting how much I care for him.",
+        "Not that much actually."
+      ],
+      "links": [
+        2,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "question_type": "String",
+      "question_title": "I already knew you loved me, any other nice words?",
+      "description": "",
+      "required": false,
+      "links": [
+        3,
+        4
+      ]
+    },
+    {
+      "question_title": "Okay, no nice words? Alright, you aren't feeling creative, just chose some here then.",
+      "description": "",
+      "required": true,
+      "question_type": "CheckBoxes",
+      "choices": [
+        "He's just so nice.",
+        "So handsome.",
+        "The best programmer there is.",
+        "He smells good."
+      ],
+      "links": []
+    },
+    {
+      "question_type": "StringMultiline",
+      "question_title": "This question shouldn't appear!",
+      "description": "Requests, problems etc.",
+      "required": false,
+      "number_of_lines": 4
+    }
+  ]
+}

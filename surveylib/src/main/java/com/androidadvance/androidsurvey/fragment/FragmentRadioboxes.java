@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,13 +29,17 @@ import java.util.List;
 
 public class FragmentRadioboxes extends Fragment {
 
-    private Question q_data;
+    private final static String TAG = Survey.LIBRARY_NAME + ":" +
+            FragmentRadioboxes.class.getSimpleName();
+
+    private Question mQuestion;
     private FragmentActivity mContext;
-    private Button button_continue;
-    private TextView textview_q_title;
-    private RadioGroup radioGroup;
-    private final ArrayList<RadioButton> allRb = new ArrayList<>();
-    private boolean at_leaset_one_checked = false;
+    private Button mContinueButton;
+    private TextView mTitleTextView;
+    private RadioGroup mRadioGroup;
+    private final ArrayList<RadioButton> mRadioBoxes = new ArrayList<>();
+    private boolean atLeastOneChecked = false;
+    private int previousLink = -1;
 
 
     @Override
@@ -43,19 +48,13 @@ public class FragmentRadioboxes extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_radioboxes, container, false);
 
-        button_continue = (Button) rootView.findViewById(R.id.button_continue);
-        textview_q_title = (TextView) rootView.findViewById(R.id.textview_q_title);
-        radioGroup = (RadioGroup) rootView.findViewById(R.id.radioGroup);
-        button_continue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((SurveyActivity) mContext).goToNext();
-            }
-        });
+        mContinueButton = rootView.findViewById(R.id.button_continue);
+        mTitleTextView = rootView.findViewById(R.id.textview_q_title);
+        mRadioGroup = rootView.findViewById(R.id.radioGroup);
 
         // Personalizing
         SurveyViewUtils
-                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, button_continue);
+                .personalizeButton(getActivity(), Survey.KEY_CONTINUE_TEXT_RES, mContinueButton);
 
         return rootView;
     }
@@ -64,24 +63,24 @@ public class FragmentRadioboxes extends Fragment {
 
         //----- collection & validation for is_required
         String the_choice = "";
-        at_leaset_one_checked = false;
-        for (RadioButton rb : allRb) {
+        atLeastOneChecked = false;
+        for (RadioButton rb : mRadioBoxes) {
             if (rb.isChecked()) {
-                at_leaset_one_checked = true;
+                atLeastOneChecked = true;
                 the_choice = rb.getText().toString();
             }
         }
 
         if (the_choice.length() > 0) {
-            Answers.getInstance().put_answer(textview_q_title.getText().toString(), the_choice);
+            Answers.getInstance().put_answer(mTitleTextView.getText().toString(), the_choice);
         }
 
 
-        if (q_data.getRequired()) {
-            if (at_leaset_one_checked) {
-                button_continue.setVisibility(View.VISIBLE);
+        if (mQuestion.getRequired()) {
+            if (atLeastOneChecked) {
+                mContinueButton.setVisibility(View.VISIBLE);
             } else {
-                button_continue.setVisibility(View.GONE);
+                mContinueButton.setVisibility(View.GONE);
             }
         }
 
@@ -94,23 +93,30 @@ public class FragmentRadioboxes extends Fragment {
 
 
         mContext = getActivity();
-        q_data = (Question) getArguments().getSerializable("data");
+        mQuestion = (Question) getArguments().getSerializable("data");
 
-        textview_q_title.setText(q_data.getQuestionTitle());
-
-
-        List<String> qq_data = q_data.getChoices();
-        if (q_data.getRandomChoices()) {
-            Collections.shuffle(qq_data);
+        // Letting everyone knows when something horrible goes wrong.
+        if (mQuestion == null) {
+            Log.e(TAG, "A fragment without data was initialized, that shouldn't happen.");
+            ((SurveyActivity) mContext).goToNext();
+            return;
         }
 
-        for (String choice : qq_data) {
+        mTitleTextView.setText(mQuestion.getQuestionTitle());
+
+
+        List<String> choices = mQuestion.getChoices();
+        if (mQuestion.getRandomChoices()) {
+            Collections.shuffle(choices);
+        }
+
+        for (String choice : choices) {
             RadioButton rb = new RadioButton(mContext);
             rb.setText(Html.fromHtml(choice));
             rb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             rb.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            radioGroup.addView(rb);
-            allRb.add(rb);
+            mRadioGroup.addView(rb);
+            mRadioBoxes.add(rb);
 
             rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -120,13 +126,31 @@ public class FragmentRadioboxes extends Fragment {
             });
         }
 
-        if (q_data.getRequired()) {
-            if (at_leaset_one_checked) {
-                button_continue.setVisibility(View.VISIBLE);
+        if (mQuestion.getRequired()) {
+            if (atLeastOneChecked) {
+                mContinueButton.setVisibility(View.VISIBLE);
             } else {
-                button_continue.setVisibility(View.GONE);
+                mContinueButton.setVisibility(View.GONE);
             }
         }
+
+        mContinueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Integer> links = mQuestion.getLinks();
+                if (links != null) {
+                    for(int i = 0; i < mRadioBoxes.size(); i++) {
+                        if(mRadioBoxes.get(i).isChecked()) {
+                            int link = i >= 0 && i < links.size() ? links.get(i) : -2;
+                            ((SurveyActivity) mContext).goToQuestion(link, previousLink);
+                            previousLink = link;
+                            break;
+                        }
+                    }
+                } else
+                    ((SurveyActivity) mContext).goToNext();
+            }
+        });
 
 
     }

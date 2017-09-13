@@ -15,16 +15,16 @@ public class Question implements Serializable {
     private String questionType;
     @SerializedName("question_title")
     @Expose
-    private String questionTitle;
+    private String questionTitle = "";
     @SerializedName("description")
     @Expose
     private String description;
     @SerializedName("required")
     @Expose
-    private Boolean required;
+    private Boolean required = false;
     @SerializedName("random_choices")
     @Expose
-    private Boolean randomChoices;
+    private Boolean randomChoices = false;
     @SerializedName("choices")
     @Expose
     private List<String> choices = new ArrayList<String>();
@@ -39,7 +39,7 @@ public class Question implements Serializable {
     private Integer numberOfLines;
     @SerializedName("links")
     @Expose
-    private List<Integer> links;
+    private List<Integer> links = null;
 
     /**
      * @return The questionType
