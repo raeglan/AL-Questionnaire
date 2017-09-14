@@ -1,13 +1,10 @@
 package com.androidadvance.androidsurvey.adapters;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.fragment.FragmentCheckboxes;
@@ -32,6 +29,7 @@ import java.util.List;
  */
 public class SurveyFragmentAdapter extends FragmentStatePagerAdapter {
 
+    @SuppressWarnings("unused")
     private static final String TAG = Survey.LIBRARY_NAME + ":" +
             SurveyFragmentAdapter.class.getSimpleName();
 
@@ -178,22 +176,8 @@ public class SurveyFragmentAdapter extends FragmentStatePagerAdapter {
     }
 
     /**
-     * Removes the item in the given position also notifies.
-     *
-     * @param index The position which should be removed, getCount is off by one as the last
-     *              element cannot be changed.
-     */
-    public void remove(int index) {
-        if (index < mFragmentOrder.size()) {
-            mFragmentOrder.remove(index);
-            notifyDataSetChanged();
-        } else {
-            Log.e(TAG, "Tried removing something out of bounds, getCount is off by one!");
-        }
-    }
-
-    /**
      * Removes every item that comes after the given index.
+     *
      * @param index exclusive, everything after this index will be deleted. Ignores the FragmentEnd.
      *              As it stays fixed no matter what.
      */

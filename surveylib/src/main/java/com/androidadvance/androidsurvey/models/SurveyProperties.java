@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+@SuppressWarnings("unused")
 public class SurveyProperties implements Serializable {
 
     @SerializedName("title")
@@ -19,6 +20,7 @@ public class SurveyProperties implements Serializable {
     @SerializedName("skip_intro")
     @Expose
     private Boolean skipIntro = Boolean.FALSE;
+    @SuppressWarnings("FieldCanBeLocal")
     @SerializedName("conditional_linking")
     @Expose
     private Boolean conditionalLinking = false;
