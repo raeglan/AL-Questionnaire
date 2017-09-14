@@ -1,7 +1,6 @@
 package com.androidadvance.androidsurvey.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.util.Log;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FragmentCheckboxes extends Fragment {
+public class FragmentCheckboxes extends QuestionAbstractFragment {
 
     private static final String TAG = Survey.LIBRARY_NAME + ":"
             + FragmentCheckboxes.class.getSimpleName();
@@ -36,10 +35,7 @@ public class FragmentCheckboxes extends Fragment {
     private Button mContinueButton;
     private TextView mTitleTextView;
     private LinearLayout linearLayout_checkboxes;
-    /**
-     * The previously made link if any.
-     */
-    private int previousLink = -1;
+
     private final ArrayList<CheckBox> mCheckBoxes = new ArrayList<>();
 
     @Override
@@ -149,7 +145,7 @@ public class FragmentCheckboxes extends Fragment {
                 if (links != null) {
                     for (int i = 0; i < mCheckBoxes.size(); i++) {
                         if (mCheckBoxes.get(i).isChecked()) {
-                            int link = i >= 0 && i < links.size() ? links.get(i) : -2;
+                            int link = i >= 0 && i < links.size() ? links.get(i) : -1;
                             ((SurveyActivity) mContext).goToQuestion(link, previousLink);
                             previousLink = link;
                             break;
@@ -160,6 +156,13 @@ public class FragmentCheckboxes extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser)
+            SurveyViewUtils.hideSoftInput(mContext);
     }
 
 

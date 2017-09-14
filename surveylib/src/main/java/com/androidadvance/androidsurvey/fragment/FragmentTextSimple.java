@@ -23,7 +23,7 @@ import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 import java.util.List;
 
-public class FragmentTextSimple extends Fragment {
+public class FragmentTextSimple extends QuestionAbstractFragment {
 
     private final static String TAG = Survey.LIBRARY_NAME + ":" +
             FragmentTextSimple.class.getSimpleName();
@@ -32,7 +32,6 @@ public class FragmentTextSimple extends Fragment {
     private Button mContinueButton;
     private TextView mTitleTextView;
     private EditText mAnswerEditText;
-    private int previousLink = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,16 +91,14 @@ public class FragmentTextSimple extends Fragment {
         mContinueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                SurveyViewUtils.hideSoftInput(mContext);
-
                 final String answer = mAnswerEditText.getText().toString().trim();
 
                 Answers.getInstance().put_answer(mTitleTextView.getText().toString(), answer);
 
                 List<Integer> links = question.getLinks();
                 if (links != null) {
-                    int link = answer.isEmpty() ? 0 : 1;
+                    int index = answer.isEmpty() ? 0 : 1;
+                    int link = index < links.size() ? links.get(index) : -1;
                     ((SurveyActivity) mContext).goToQuestion(link, previousLink);
                     previousLink = link;
                 } else

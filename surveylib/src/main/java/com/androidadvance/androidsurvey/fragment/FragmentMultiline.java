@@ -25,7 +25,7 @@ import com.androidadvance.androidsurvey.utils.SurveyViewUtils;
 
 import java.util.List;
 
-public class FragmentMultiline extends Fragment {
+public class FragmentMultiline extends QuestionAbstractFragment {
 
     /**
      * Tag for identifying errors in this class.
@@ -38,10 +38,6 @@ public class FragmentMultiline extends Fragment {
     private TextView mTitleTextView;
     private EditText mAnswerEditText;
     private Question mQuestion;
-    /**
-     * Previously made link, if any.
-     */
-    private int previousLink = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,16 +99,14 @@ public class FragmentMultiline extends Fragment {
         mContinueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                SurveyViewUtils.hideSoftInput(mContext);
-
                 String answer = mAnswerEditText.getText().toString().trim();
                 Answers.getInstance().put_answer(mTitleTextView.getText().toString(),
                         answer);
 
                 List<Integer> links = mQuestion.getLinks();
                 if (links != null) {
-                    int link = answer.isEmpty() ? 0 : 1;
+                    int index = answer.isEmpty() ? 0 : 1;
+                    int link = index < links.size() ? links.get(index) : -1;
                     ((SurveyActivity) mContext).goToQuestion(link, previousLink);
                     previousLink = link;
                 } else

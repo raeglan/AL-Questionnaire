@@ -1,11 +1,13 @@
 package com.androidadvance.androidsurvey.adapters;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 import com.androidadvance.androidsurvey.Survey;
 import com.androidadvance.androidsurvey.fragment.FragmentCheckboxes;
@@ -15,6 +17,7 @@ import com.androidadvance.androidsurvey.fragment.FragmentNumber;
 import com.androidadvance.androidsurvey.fragment.FragmentRadioboxes;
 import com.androidadvance.androidsurvey.fragment.FragmentStart;
 import com.androidadvance.androidsurvey.fragment.FragmentTextSimple;
+import com.androidadvance.androidsurvey.fragment.QuestionAbstractFragment;
 import com.androidadvance.androidsurvey.models.Question;
 import com.androidadvance.androidsurvey.models.SurveyProperties;
 
@@ -27,11 +30,23 @@ import java.util.List;
  *
  * @author Rafael miranda
  */
-public class SurveyFragmentAdapter extends FragmentPagerAdapter {
+public class SurveyFragmentAdapter extends FragmentStatePagerAdapter {
+
+    private static final String TAG = Survey.LIBRARY_NAME + ":" +
+            SurveyFragmentAdapter.class.getSimpleName();
 
     private final List<Question> mQuestions;
     private final SurveyProperties mSurveyProperties;
     private final List<Integer> mFragmentOrder;
+
+    /*
+     * A list of the already created fragments and their position. It changes whenever a new one
+     * gets added or deleted from the order list so that the pager can make a new request.
+     * <br><br>
+     * The key should be the position and value is the hashcode of the fragment in this
+     * position, both should be unique.
+     * private final SparseIntArray mCreatedFragmentHashes;
+     */
 
     /**
      * Instantiates a new fragment adapter that handles creating fragments and giving them to the
@@ -101,6 +116,11 @@ public class SurveyFragmentAdapter extends FragmentPagerAdapter {
                             question.getQuestionType());
             }
 
+            // check if some connection has already been made by this question
+            if (question.getLinks() != null && position + 1 < mFragmentOrder.size())
+                ((QuestionAbstractFragment) fragment)
+                        .setPreviousLink(mFragmentOrder.get(position + 1));
+
             // putting all the extra data needed to fill the question.
             Bundle arguments = new Bundle();
             arguments.putSerializable("data", question);
@@ -110,6 +130,20 @@ public class SurveyFragmentAdapter extends FragmentPagerAdapter {
         return fragment;
     }
 
+    /**
+     * We need to make sure the object is still as the same position as before, if not then we tell
+     * the pager that.
+     *
+     * @param object the object that we need to verify the position of.
+     * @return the current position of this object or POSITION_NONE if it can't be found.
+     */
+    @Override
+    public int getItemPosition(Object object) {
+        // todo: Optimize. There can be duplicates and the list saved contain only numbers.
+        if (mSurveyProperties.getConditionalLinking())
+            return POSITION_NONE;
+        else return POSITION_UNCHANGED;
+    }
 
     /**
      * Returns the number of fragments that can be displayed. This number represents the start
@@ -146,10 +180,27 @@ public class SurveyFragmentAdapter extends FragmentPagerAdapter {
     /**
      * Removes the item in the given position also notifies.
      *
-     * @param index The position which should be removed.
+     * @param index The position which should be removed, getCount is off by one as the last
+     *              element cannot be changed.
      */
     public void remove(int index) {
-        mFragmentOrder.remove(index);
+        if (index < mFragmentOrder.size()) {
+            mFragmentOrder.remove(index);
+            notifyDataSetChanged();
+        } else {
+            Log.e(TAG, "Tried removing something out of bounds, getCount is off by one!");
+        }
+    }
+
+    /**
+     * Removes every item that comes after the given index.
+     * @param index exclusive, everything after this index will be deleted. Ignores the FragmentEnd.
+     *              As it stays fixed no matter what.
+     */
+    public void clearAfter(int index) {
+        int nextItem = index + 1;
+        while (nextItem < mFragmentOrder.size())
+            mFragmentOrder.remove(nextItem);
         notifyDataSetChanged();
     }
 }

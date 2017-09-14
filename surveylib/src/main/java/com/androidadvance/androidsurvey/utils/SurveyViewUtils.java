@@ -78,13 +78,16 @@ public class SurveyViewUtils {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                // making the soft input only appear when the fragment is visible.
-                viewToFocus.requestFocus();
-                InputMethodManager imm =
-                        (InputMethodManager) context.getSystemService(Service.INPUT_METHOD_SERVICE);
-                // shouldn't be the case, but who knows. Then we just don't show the soft input
-                if (imm != null) {
-                    imm.showSoftInput(viewToFocus, 0);
+                //noinspection ConstantConditions
+                if(viewToFocus != null) {
+                    // making the soft input only appear when the fragment is visible.
+                    viewToFocus.requestFocus();
+                    InputMethodManager imm =
+                            (InputMethodManager) context.getSystemService(Service.INPUT_METHOD_SERVICE);
+                    // shouldn't be the case, but who knows. Then we just don't show the soft input
+                    if (imm != null) {
+                        imm.showSoftInput(viewToFocus, 0);
+                    }
                 }
             }
         }, 100);
@@ -99,6 +102,7 @@ public class SurveyViewUtils {
         // Check if no view has focus:
         final View view = currentActivity.getCurrentFocus();
         if (view != null) {
+
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

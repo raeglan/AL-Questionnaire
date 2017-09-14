@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FragmentRadioboxes extends Fragment {
+public class FragmentRadioboxes extends QuestionAbstractFragment {
 
     private final static String TAG = Survey.LIBRARY_NAME + ":" +
             FragmentRadioboxes.class.getSimpleName();
@@ -39,7 +39,6 @@ public class FragmentRadioboxes extends Fragment {
     private RadioGroup mRadioGroup;
     private final ArrayList<RadioButton> mRadioBoxes = new ArrayList<>();
     private boolean atLeastOneChecked = false;
-    private int previousLink = -1;
 
 
     @Override

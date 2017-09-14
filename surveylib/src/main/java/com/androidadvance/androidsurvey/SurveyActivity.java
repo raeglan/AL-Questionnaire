@@ -3,25 +3,16 @@ package com.androidadvance.androidsurvey;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.androidadvance.androidsurvey.adapters.SurveyFragmentAdapter;
-import com.androidadvance.androidsurvey.fragment.FragmentCheckboxes;
-import com.androidadvance.androidsurvey.fragment.FragmentEnd;
-import com.androidadvance.androidsurvey.fragment.FragmentMultiline;
-import com.androidadvance.androidsurvey.fragment.FragmentNumber;
-import com.androidadvance.androidsurvey.fragment.FragmentRadioboxes;
-import com.androidadvance.androidsurvey.fragment.FragmentStart;
-import com.androidadvance.androidsurvey.fragment.FragmentTextSimple;
 import com.androidadvance.androidsurvey.models.Question;
 import com.androidadvance.androidsurvey.models.SurveyPojo;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 /**
  * The class that creates the survey, it should be initialized with an intent containing the json.
@@ -31,6 +22,7 @@ public class SurveyActivity extends AppCompatActivity {
     private SurveyPojo mSurveyPojo;
     private ViewPager mPager;
     private SurveyFragmentAdapter mPagerAdapter;
+    public static final int LINK_NOT_SET = -31241;
 
     // todo: Make the activity lifecycle aware/safe.
     // todo: A better way to start a survey, using a helper class that initializes everything and creates the intent
@@ -118,15 +110,13 @@ public class SurveyActivity extends AppCompatActivity {
      * @param previousNext   if previously selected, then what question was chosen by the link made.
      */
     public void goToQuestion(int questionNumber, int previousNext) {
-        if (previousNext == questionNumber)
-            goToNext();
-        else if (previousNext == -1)
+        if (previousNext == LINK_NOT_SET)
             goToQuestion(questionNumber);
+        else if (previousNext == questionNumber)
+            goToNext();
         else {
             // if they differ we need to delete everything that got added because of this choice.
-            for (int i = mPager.getCurrentItem() + 1; i < mPagerAdapter.getCount(); i++) {
-                mPagerAdapter.remove(i);
-            }
+            mPagerAdapter.clearAfter(mPager.getCurrentItem());
             goToQuestion(questionNumber);
         }
     }

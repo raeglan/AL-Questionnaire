@@ -37,14 +37,14 @@
       "required": false,
       "links": [
         3,
-        4
+        -1
       ]
     },
     {
       "question_title": "Okay, no nice words? Alright, you aren't feeling creative, just chose some here then.",
       "description": "",
       "required": true,
-      "question_type": "CheckBoxes",
+      "question_type": "Checkboxes",
       "choices": [
         "He's just so nice.",
         "So handsome.",
