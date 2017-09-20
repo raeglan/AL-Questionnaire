@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroidSurveyExample</string>
+    <string name="app_name">AL Questionnaire</string>
     <string name="test_continue">Proceed</string>
     <string name="test_start">Let us begin.</string>
     <string name="test_finish">Indeed.</string>

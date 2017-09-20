@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidadvance.com.androidsurveyexample" >
+    package="de.alfingo.al_questionnaire_example" >
 
     <application
         android:allowBackup="true"
@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
         android:theme="@style/AppTheme" >
-        <activity android:name=".MainActivity" >
+        <activity android:name="de.alfingo.al_questionnaire_example.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
